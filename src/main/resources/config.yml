@@ -1,5 +1,5 @@
 database:
-  url: "jdbc:sqlite::memory:"
+  url: "jdbc:sqlite:/tmp/test.db"
   driverClass: org.sqlite.JDBC
   properties:
     charSet: UTF-8

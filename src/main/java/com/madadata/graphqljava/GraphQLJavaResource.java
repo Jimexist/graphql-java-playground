@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
@@ -91,7 +92,9 @@ public class GraphQLJavaResource {
             logger.info("query '{}'", query);
             ExecutionResult result = new GraphQL(schema).execute(query);
             checkState(result.getErrors().isEmpty(), "errors: %s", result.getErrors());
-            return (User) result.getData();
+            Map<String, Object> data = (Map<String, Object>) result.getData();
+            logger.info("data {}", data);
+            return (User) data.get("user");
         } catch (Exception e) {
             logger.info("exception during graphql query", e);
             throw new WebApplicationException(e, BAD_REQUEST);
