@@ -3,17 +3,23 @@ package com.madadata.graphqljava;
 import com.codahale.metrics.annotation.Timed;
 import com.madadata.graphqljava.api.User;
 import com.madadata.graphqljava.dao.UserDAO;
+import graphql.ExecutionResult;
 import graphql.GraphQL;
 import graphql.schema.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
 import static graphql.Scalars.GraphQLID;
 import static graphql.Scalars.GraphQLString;
+import static graphql.schema.GraphQLArgument.newArgument;
 import static graphql.schema.GraphQLFieldDefinition.newFieldDefinition;
 import static graphql.schema.GraphQLObjectType.newObject;
+import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
 /**
  * Created by jiayu on 3/10/16.
@@ -22,6 +28,8 @@ import static graphql.schema.GraphQLObjectType.newObject;
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class GraphQLJavaResource {
+
+    private static final Logger logger = LoggerFactory.getLogger(GraphQLJavaResource.class);
 
     private final UserDAO userDAO;
 
@@ -58,6 +66,11 @@ public class GraphQLJavaResource {
                 .description("user query")
                 .field(newFieldDefinition()
                         .name("user")
+                        .argument(newArgument()
+                                .name("id")
+                                .description("user id")
+                                .type(GraphQLString)
+                                .build())
                         .type(userType)
                         .dataFetcher(dataFetchingEnvironment -> {
                             checkArgument(dataFetchingEnvironment.containsArgument("id"), "cannot find argument 'id'");
@@ -74,6 +87,14 @@ public class GraphQLJavaResource {
     @GET
     @Timed
     public User findUser(@QueryParam("query") String query) {
-        return (User) new GraphQL(schema).execute(query).getData();
+        try {
+            logger.info("query '{}'", query);
+            ExecutionResult result = new GraphQL(schema).execute(query);
+            checkState(result.getErrors().isEmpty(), "errors: %s", result.getErrors());
+            return (User) result.getData();
+        } catch (Exception e) {
+            logger.info("exception during graphql query", e);
+            throw new WebApplicationException(e, BAD_REQUEST);
+        }
     }
 }
