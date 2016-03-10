@@ -12,5 +12,5 @@ import org.skife.jdbi.v2.sqlobject.customizers.RegisterMapper;
 public interface UserDAO {
 
     @SqlQuery("select * from Users where id = :id")
-    User findById(@Bind("id") String id);
+    User findById(@Bind("id") int id);
 }

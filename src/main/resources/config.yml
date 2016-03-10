@@ -3,3 +3,7 @@ database:
   driverClass: org.sqlite.JDBC
   properties:
     charSet: UTF-8
+
+logging:
+  loggers:
+    "org.skife.jdbi.v2": DEBUG

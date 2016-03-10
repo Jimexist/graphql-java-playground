@@ -1,5 +1,6 @@
 package com.madadata.graphqljava.dao;
 
+import com.google.common.collect.ImmutableList;
 import com.madadata.graphqljava.api.User;
 import org.skife.jdbi.v2.StatementContext;
 import org.skife.jdbi.v2.tweak.ResultSetMapper;
@@ -18,6 +19,10 @@ public class UserMapper implements ResultSetMapper<User> {
 
     @Override
     public User map(int index, ResultSet r, StatementContext ctx) throws SQLException {
-        return null;
+        return new User(r.getInt("id"),
+                r.getString("firstName"),
+                r.getString("lastName"),
+                r.getString("email"),
+                ImmutableList.of());
     }
 }
