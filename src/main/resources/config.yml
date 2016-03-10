@@ -1,0 +1,5 @@
+database:
+  url: "jdbc:sqlite::memory:"
+  driverClass: org.sqlite.JDBC
+  properties:
+    charSet: UTF-8
